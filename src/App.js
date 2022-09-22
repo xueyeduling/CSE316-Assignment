@@ -332,6 +332,7 @@ class App extends React.Component {c
     // THIS FUNCTION BEGINS THE PROCESS OF EDITING A SONG.
     editSong(index, song) {
         let list = this.state.currentList;
+        // List Saving
         list.songs[index] = song;
         this.setStateWithUpdatedList(list);
     }
