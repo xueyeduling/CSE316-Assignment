@@ -45,6 +45,17 @@ class App extends React.Component {c
             currentList : null,
             sessionData : loadedSessionData
         }
+        // ctrl + z and ctrl + y available
+        document.onkeydown = (event) => {
+            if(event.ctrlKey) {
+                if(event.key === 'z' || event.key === 'Z') {
+                    this.undo();
+                }
+                else if(event.key === 'y' || event.key === 'Y') {
+                    this.redo();
+                }
+            }
+        }
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
