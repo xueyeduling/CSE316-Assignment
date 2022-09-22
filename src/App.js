@@ -7,6 +7,7 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import EditSong_Transaction from  './transactions/EditSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -301,10 +302,19 @@ class App extends React.Component {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
     }
-    // 
-    edtiMarkedSong() {
-
+    // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
+    addEdtiMarkedSongTransaction = (Song) => {
+        let transaction = new EditSong_Transaction(this, Song);
+        this.tps.addTransaction(transaction);
+        this.hideEditSongModal();
     }
+    // THIS FUNCTION BEGINS THE PROCESS OF EDITING A SONG.
+    editSong(index, song) {
+        let list = this.state.currentList;
+        list.songs[index] = song;
+        this.setStateWithUpdatedList(list);
+    }
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
@@ -347,7 +357,7 @@ class App extends React.Component {
                     index={this.state.songIndexMarkedForEdition}
                     currentList={this.state.currentList}
                     hideEditSongModalCallback={this.hideEditSongModal}
-                    edtiSongCallback={this.edtiMarkedSong}
+                    edtiSongCallback={this.addEdtiMarkedSongTransaction}
                 />
             </div>
         );
