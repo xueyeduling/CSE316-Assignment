@@ -8,6 +8,7 @@ import jsTPS from './common/jsTPS.js';
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import EditSong_Transaction from  './transactions/EditSong_Transaction.js';
+import AddSong_Transaction from  './transactions/AddSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -201,6 +202,7 @@ class App extends React.Component {
     setStateWithUpdatedList(list) {
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            songIndexMarkedForEdition : -1,
             currentList : list,
             sessionData : this.state.sessionData
         }), () => {
@@ -302,7 +304,7 @@ class App extends React.Component {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
     }
-    // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
+    // THIS FUNCTION ADDS A EditSong_Transaction TO THE TRANSACTION STACK
     addEdtiMarkedSongTransaction = (Song) => {
         let transaction = new EditSong_Transaction(this, Song);
         this.tps.addTransaction(transaction);
@@ -312,6 +314,24 @@ class App extends React.Component {
     editSong(index, song) {
         let list = this.state.currentList;
         list.songs[index] = song;
+        this.setStateWithUpdatedList(list);
+    }
+    // THIS FUNCTION ADDS A AddSong_Transaction TO THE TRANSACTION STACK
+    addAddSongTransaction = () => {
+        let transaction = new AddSong_Transaction(this);
+        this.tps.addTransaction(transaction);
+        this.hideEditSongModal();
+    }
+    // THIS FUNCTION BEGINS THE PROCESS OF ADDING A SONG.
+    addSong(song) {
+        let list = this.state.currentList;
+        list.songs.push(song);
+        this.setStateWithUpdatedList(list);
+    }
+    //  THIS FUNCTION BEGINS THE PROCESS OF POPING A SONG.
+    popSong() {
+        let list = this.state.currentList;
+        list.songs.pop();
         this.setStateWithUpdatedList(list);
     }
 
@@ -338,6 +358,7 @@ class App extends React.Component {
                     canUndo={canUndo}
                     canRedo={canRedo}
                     canClose={canClose} 
+                    addSongCallback={this.addAddSongTransaction}
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
