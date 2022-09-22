@@ -37,6 +37,11 @@ class App extends React.Component {c
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
 
+        //
+        this.deleteListModal = false;
+        this.editSongModal = false;
+        this.removeSongModal = false;
+
         // SETUP THE INITIAL STATE
         this.state = {
             listKeyPairMarkedForDeletion : null,
@@ -105,6 +110,8 @@ class App extends React.Component {c
 
             // SO IS STORING OUR SESSION DATA
             this.db.mutationUpdateSessionData(this.state.sessionData);
+
+            this.updateToolbarButtons();
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF DELETING A LIST.
@@ -142,6 +149,8 @@ class App extends React.Component {c
 
             // SO IS STORING OUR SESSION DATA
             this.db.mutationUpdateSessionData(this.state.sessionData);
+
+            this.updateToolbarButtons();
         });
     }
     deleteMarkedList = () => {
@@ -200,6 +209,7 @@ class App extends React.Component {c
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
             this.tps.clearAllTransactions();
+            this.updateToolbarButtons();
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -214,6 +224,7 @@ class App extends React.Component {c
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
             this.tps.clearAllTransactions();
+            this.updateToolbarButtons();
         });
     }
     setStateWithUpdatedList(list) {
@@ -269,6 +280,7 @@ class App extends React.Component {c
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
             this.db.mutationUpdateList(this.state.currentList);
         }
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING A REDO
     redo = () => {
@@ -278,6 +290,7 @@ class App extends React.Component {c
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
             this.db.mutationUpdateList(this.state.currentList);
         }
+        this.updateToolbarButtons();
     }
     markListForDeletion = (keyPair) => {
         this.setState(prevState => ({
@@ -294,11 +307,15 @@ class App extends React.Component {c
     showDeleteListModal() {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.add("is-visible");
+        this.deleteListModal = true;
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteListModal() {
+    hideDeleteListModal = () =>  {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.remove("is-visible");
+        this.deleteListModal = false;
+        this.updateToolbarButtons();
     }
     
     markSongForEdition = (index) => {
@@ -317,11 +334,15 @@ class App extends React.Component {c
     showEditSongModal() {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.add("is-visible");
+        this.editSongModal = true;
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideEditSongModal() {
+    hideEditSongModal = () =>  {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
+        this.editSongModal = false;
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION ADDS A EditSong_Transaction TO THE TRANSACTION STACK
     addEdtiMarkedSongTransaction = (Song) => {
@@ -371,11 +392,15 @@ class App extends React.Component {c
     showRemoveSongModal() {
         let modal = document.getElementById("remove-song-modal");
         modal.classList.add("is-visible");
+        this.removeSongModal = true;
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideRemoveSongModal() {
+    hideRemoveSongModal = () => {
         let modal = document.getElementById("remove-song-modal");
         modal.classList.remove("is-visible");
+        this.removeSongModal =false;
+        this.updateToolbarButtons();
     }
     // THIS FUNCTION ADDS A RemoveSong_Transaction TO THE TRANSACTION STACK
     addRemoveSongTransaction = (index) => {
@@ -401,6 +426,60 @@ class App extends React.Component {c
         let list = this.state.currentList;
         list.songs.splice(index, 0, song);
         this.setStateWithUpdatedList(list);
+    }
+    /*
+        disableButton
+
+        This function disables the button that has the id parameter
+        as it's id property. This should be done as part of a foolproof
+        design strategy.
+    */
+    disableButton(id) {
+        let button = document.getElementById(id);
+        button.classList.add("disabled");
+        button.disabled = true;
+    }
+    /*
+        enableButton
+
+        This function enables the button that has the id parameter
+        as it's id property. This should be done as part of a foolproof
+        design strategy.
+    */    
+    enableButton(id) {
+        let button = document.getElementById(id);
+        button.classList.remove("disabled");
+        button.disabled = false;
+    }
+    // 
+    updateToolbarButtons() {
+        if(this.deleteListModal || this.editSongModal || this.removeSongModal) {
+            this.disableButton("add-list-button");
+            this.disableButton("add-song-button");
+            this.disableButton("undo-button");
+            this.disableButton("redo-button");
+            this.disableButton("close-button");
+        }
+        else{
+            if(this.state.currentList !== null) this.disableButton("add-list-button");
+            else {
+                this.enableButton("add-list-button");
+                this.disableButton("add-song-button");
+                this.disableButton("undo-button");
+                this.disableButton("redo-button");
+                this.disableButton("close-button");
+                return;
+            }
+
+            this.enableButton("add-song-button");
+            this.enableButton("close-button");
+
+            if(this.tps.hasTransactionToUndo()) this.enableButton("undo-button");
+            else this.disableButton("undo-button");
+
+            if(this.tps.hasTransactionToRedo()) this.enableButton("redo-button");
+            else this.disableButton("redo-button");;
+        }
     }
 
     render() {

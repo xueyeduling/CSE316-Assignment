@@ -8,16 +8,17 @@ export default class EditToolbar extends React.Component {
         let undoClass = "toolbar-button";
         let redoClass = "toolbar-button";
         let closeClass = "toolbar-button";
-        if (canAddSong) addSongClass += " disabled";
-        if (canUndo) undoClass += " disabled";
-        if (canRedo) redoClass += " disabled";
-        if (canClose) closeClass += " disabled";
+        if (!canAddSong) addSongClass += " disabled";
+        if (!canUndo) undoClass += " disabled";
+        if (!canRedo) redoClass += " disabled";
+        if (!canClose) closeClass += " disabled";
         return (
             <div id="edit-toolbar">
             <input 
                 type="button" 
                 id='add-song-button' 
                 value="+" 
+                disabled={!canAddSong}
                 className={addSongClass}
                 onClick={addSongCallback}
             />
@@ -25,6 +26,7 @@ export default class EditToolbar extends React.Component {
                 type="button" 
                 id='undo-button' 
                 value="⟲" 
+                disabled={!canUndo}
                 className={undoClass} 
                 onClick={undoCallback}
             />
@@ -32,6 +34,7 @@ export default class EditToolbar extends React.Component {
                 type="button" 
                 id='redo-button' 
                 value="⟳" 
+                disabled={!canRedo}
                 className={redoClass} 
                 onClick={redoCallback}
             />
@@ -39,6 +42,7 @@ export default class EditToolbar extends React.Component {
                 type="button" 
                 id='close-button' 
                 value="&#x2715;" 
+                disabled={!canClose}
                 className={closeClass} 
                 onClick={closeCallback}
             />
