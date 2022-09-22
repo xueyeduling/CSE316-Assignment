@@ -9,10 +9,12 @@ import jsTPS from './common/jsTPS.js';
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import EditSong_Transaction from  './transactions/EditSong_Transaction.js';
 import AddSong_Transaction from  './transactions/AddSong_Transaction.js';
+import RemoveSong_Transaction from  './transactions/RemoveSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import EditSongModal from './components/EditSongModal';
+import RemoveSongModal from './components/RemoveSongModal';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -22,7 +24,7 @@ import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
 
-class App extends React.Component {
+class App extends React.Component {c
     constructor(props) {
         super(props);
 
@@ -39,6 +41,7 @@ class App extends React.Component {
         this.state = {
             listKeyPairMarkedForDeletion : null,
             songIndexMarkedForEdition : -1,
+            songIndexMarkedForRemove: -1,
             currentList : null,
             sessionData : loadedSessionData
         }
@@ -78,6 +81,7 @@ class App extends React.Component {
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newList,
             songIndexMarkedForEdition : -1,
+            songIndexMarkedForRemove: -1,
             sessionData: {
                 nextKey: prevState.sessionData.nextKey + 1,
                 counter: prevState.sessionData.counter + 1,
@@ -178,6 +182,7 @@ class App extends React.Component {
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             songIndexMarkedForEdition : -1,
+            songIndexMarkedForRemove: -1,
             currentList: newCurrentList,
             sessionData: this.state.sessionData
         }), () => {
@@ -191,6 +196,7 @@ class App extends React.Component {
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             songIndexMarkedForEdition : -1,
+            songIndexMarkedForRemove: -1,
             currentList: null,
             sessionData: this.state.sessionData
         }), () => {
@@ -203,6 +209,7 @@ class App extends React.Component {
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             songIndexMarkedForEdition : -1,
+            songIndexMarkedForRemove: -1,
             currentList : list,
             sessionData : this.state.sessionData
         }), () => {
@@ -287,6 +294,7 @@ class App extends React.Component {
         this.setState(prevState => ({
             currentList: prevState.currentList,
             songIndexMarkedForEdition : index,
+            songIndexMarkedForRemove: -1,
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: prevState.sessionData
         }), () => {
@@ -335,6 +343,54 @@ class App extends React.Component {
         this.setStateWithUpdatedList(list);
     }
 
+    markSongForRemove = (index) => {
+        this.setState(prevState => ({
+            currentList: prevState.currentList,
+            songIndexMarkedForEdition : prevState.songIndexMarkedForEdition,
+            songIndexMarkedForRemove: index,
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            sessionData: prevState.sessionData
+        }), () => {
+            // PROMPT THE USER
+            this.showRemoveSongModal();
+        });
+    }
+    // TO SEE IF THEY REALLY WANT TO REMOVE THE SONG
+    showRemoveSongModal() {
+        let modal = document.getElementById("remove-song-modal");
+        modal.classList.add("is-visible");
+    }
+    // THIS FUNCTION IS FOR HIDING THE MODAL
+    hideRemoveSongModal() {
+        let modal = document.getElementById("remove-song-modal");
+        modal.classList.remove("is-visible");
+    }
+    // THIS FUNCTION ADDS A RemoveSong_Transaction TO THE TRANSACTION STACK
+    addRemoveSongTransaction = (index) => {
+        this.setState(prevState => ({
+            currentList: prevState.currentList,
+            songIndexMarkedForEdition : prevState.songIndexMarkedForEdition,
+            songIndexMarkedForRemove: -1,
+            listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
+            sessionData: prevState.sessionData
+        }));
+        let transaction = new RemoveSong_Transaction(this, index);
+        this.tps.addTransaction(transaction);
+        this.hideRemoveSongModal();
+    }
+    // THIS FUNCTION BEGINS THE PROCESS OF REMOVING A SONG.
+    removeSongByIndex(index) {
+        let list = this.state.currentList;
+        list.songs.splice(index, 1);
+        this.setStateWithUpdatedList(list);
+    }
+    // THIS FUNCTION BEGINS THE PROCESS OF ADDING A SONG BY INDEX.
+    addSongByIndex(index, song) {
+        let list = this.state.currentList;
+        list.songs.splice(index, 0, song);
+        this.setStateWithUpdatedList(list);
+    }
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
@@ -366,7 +422,8 @@ class App extends React.Component {
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction} 
-                    editSongCallback={this.markSongForEdition}/>
+                    editSongCallback={this.markSongForEdition}
+                    removeSongCallback={this.markSongForRemove}/>
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteListModal
@@ -379,6 +436,12 @@ class App extends React.Component {
                     currentList={this.state.currentList}
                     hideEditSongModalCallback={this.hideEditSongModal}
                     edtiSongCallback={this.addEdtiMarkedSongTransaction}
+                />
+                <RemoveSongModal
+                    index={this.state.songIndexMarkedForRemove}
+                    currentList={this.state.currentList}
+                    hideRemoveSongModalCallback={this.hideRemoveSongModal}
+                    removeSongCallback={this.addRemoveSongTransaction}
                 />
             </div>
         );

@@ -57,6 +57,10 @@ export default class SongCard extends React.Component {
         // ASK THE MODEL TO MOVE THE DATA
         this.props.moveCallback(sourceId, targetId);
     }
+    handleRemoveSong = (event) => {
+        event.stopPropagation();
+        this.props.removeSongCallback(this.props.index);
+    }
 
     getItemNum = () => {
         return this.props.id.substring("playlist-song-".length);
@@ -84,7 +88,7 @@ export default class SongCard extends React.Component {
             >
                 {num + ". "}
                 <a href={"https://www.youtube.com/watch?v=" + song.youTubeId}>{song.title} by {song.artist}</a>
-                <input type="button" id={"remove-song-button-" + (num + 1)} value="✕" className="list-button"/>
+                <input type="button" id={"remove-song-button-" + (num + 1)} value="✕" className="list-button" onClick={this.handleRemoveSong}/>
             </div>
         )
     }

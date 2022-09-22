@@ -34,18 +34,18 @@ export default class EditSongModal extends Component {
         this.props.edtiSongCallback(song);
     }
     render() {
-        const { index, currentList, hideEditSongModalCallback } = this.props;
+        const { index, currentList } = this.props;
         let song = {};
         if(currentList && currentList.songs.length > 0 && index >= 0) {
             song = currentList.songs[index];
         }
 
-        if(this.stateSet != index) {
-            this.state = {
+        if(this.stateSet !== index) {
+            this.setState({
                 title: song.title,
                 artist: song.artist,
                 youTubeId: song.youTubeId
-            }
+            });
             this.stateSet = index;
         }
 
