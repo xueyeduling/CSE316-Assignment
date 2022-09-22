@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Tangerine&display=swap');
+
 :root {
   /* 
         FIRST WE'LL DEFINE OUR SWATCHES, i.e. THE COMPLEMENTARY
@@ -19,7 +21,7 @@ body {
 
 #root {
   background-color: var(--swatch-primary);
-  font-family: serif;
+  font-family: 'Tangerine', serif;
   position: absolute;
   width: 80%;
   left: 10%;
@@ -109,7 +111,7 @@ body {
 }
 
 .list-card, .selected-list-card, .unselected-list-card {
-  font-size: 18pt;
+  font-size: 32pt;
   margin: 10px;
   padding: 20px;
   border-radius: 25px;
@@ -156,12 +158,21 @@ body {
 .playlister-song, .playlister-song-dragged-to { 
   display:flex;
   align-items: center;
-  font-size: 24pt;
+  font-size: 36pt;
   height:20%;
 }
 
 input {
   font-size:20pt;
+}
+
+.list-button {
+  font-size:20pt;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 3px;
+  float:right;
 }
 
 
@@ -248,6 +259,36 @@ span {
 
 .modal-textfield {
   font-size:28pt;
+}
+
+.modal-center-content-title {
+  display: grid;
+  grid-row: 1 / 2;
+}
+
+.modal-center-content-artist {
+  display: grid;
+  grid-row: 2 / 3;
+}
+
+.modal-center-content-youtubeid {
+  display: grid;
+  grid-row: 3 / 4;
+}
+
+.modal-center-content-lable {
+  width: 300px;
+  grid-column: 1 / 2;
+}
+
+.modal-center-content-input{
+  grid-column: 2 / 3;
+  height: 50px;
+  width: 400px;
+  font-size: 28pt;
+  font-weight: normal;
+  margin-right: 0px;
+  float: right;
 }
 
 .modal-button {
