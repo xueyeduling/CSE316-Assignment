@@ -269,6 +269,9 @@ class App extends React.Component {c
     }
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
+        if(start === end){
+            return;
+        }
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
